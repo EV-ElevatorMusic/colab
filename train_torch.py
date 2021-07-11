@@ -236,6 +236,8 @@ if __name__ == "__main__":
         )
         # python train_torch.py --train --gpus 1 --max_epochs 3
         model = KoGPT2Chat(args)
+        model = model.load_from_checkpoint(args.model_params)
+
         model.train()
         trainer = Trainer.from_argparse_args(
             args,
