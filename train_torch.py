@@ -45,11 +45,11 @@ MASK = '<unused0>'
 SENT = '<unused1>'
 PAD = '<pad>'
 
-REC='<unused2>'
+
 TOKENIZER = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2",
             bos_token=BOS, eos_token=EOS, unk_token='<unk>',
             pad_token=PAD, mask_token=MASK) 
-TOKENIZER.add_special_tokens({ "additional_special_tokens": [ REC ] })
+
 
 class CharDataset(Dataset):
     def __init__(self, chats, max_len=32):
@@ -64,7 +64,7 @@ class CharDataset(Dataset):
         self.pad = PAD
         self.max_len = max_len
         self.tokenizer = TOKENIZER 
-        self.rec=REC
+        
     def __len__(self):
         return len(self._data)
 
@@ -76,11 +76,9 @@ class CharDataset(Dataset):
         q_toked = self.tokenizer.tokenize(self.q_token + q + \
                                           self.sent_token + sentiment)   
         q_len = len(q_toked)
-        if sentiment=='2':
-            a_toked = self.tokenizer.tokenize(self.a_token + self.rec)
-            print(a_toked)
-        else:
-            a_toked = self.tokenizer.tokenize(self.a_token + a + self.eos)
+        
+     
+        a_toked = self.tokenizer.tokenize(self.a_token + a + self.eos)
         a_len = len(a_toked)
         if q_len + a_len > self.max_len:
             a_len = self.max_len - q_len
@@ -215,9 +213,7 @@ class KoGPT2Chat(LightningModule):
                             dim=-1).squeeze().numpy().tolist())[-1]
                     if gen == EOS:
                         break
-                    elif gen==REC:
-                        print('노래를 추천해 드릴게요')
-                        break
+                    
                     a += gen.replace('▁', ' ')
                 print("Simsimi > {}".format(a.strip()))
 
